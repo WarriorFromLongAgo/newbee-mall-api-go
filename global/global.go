@@ -12,6 +12,6 @@ var (
 	GVA_DB      *gorm.DB
 	GVA_VP      *viper.Viper
 	GVA_LOG     *zap.Logger
-	GVA_Ali_Pay alipay.Client
+	GVA_Ali_Pay *alipay.Client
 	GVA_CONFIG  config.Server
 )

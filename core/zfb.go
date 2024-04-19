@@ -6,7 +6,7 @@ import (
 	"main.go/global"
 )
 
-func zfb() *alipay.Client {
+func Zfb() *alipay.Client {
 	alipayConfig := global.GVA_CONFIG.AlipayConfig
 	appID := alipayConfig.AppID
 	privateKey := alipayConfig.MyPrivateKey
@@ -19,8 +19,6 @@ func zfb() *alipay.Client {
 	if err != nil {
 		panic(fmt.Errorf("加载支付宝配置异常： %s \n", err))
 	}
-
-	client.TradeWapPay()
 
 	return client
 }

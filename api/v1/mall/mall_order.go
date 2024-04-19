@@ -2,6 +2,7 @@ package mall
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/smartwalle/alipay/v3"
 	"go.uber.org/zap"
 	"main.go/global"
 	"main.go/model/common/response"
@@ -46,6 +47,22 @@ func (m *MallOrderApi) SaveOrder(c *gin.Context) {
 func (m *MallOrderApi) PaySuccess(c *gin.Context) {
 	orderNo := c.Query("orderNo")
 	payType, _ := strconv.Atoi(c.Query("payType"))
+	if err := mallOrderService.PaySuccess(orderNo, payType); err != nil {
+		global.GVA_LOG.Error("订单支付失败", zap.Error(err))
+		response.FailWithMessage("订单支付失败:"+err.Error(), c)
+	}
+	response.OkWithMessage("订单支付成功", c)
+}
+
+func (m *MallOrderApi) Pay(c *gin.Context) {
+	orderNo := c.Query("orderNo")
+	payType, _ := strconv.Atoi(c.Query("payType"))
+
+	tradeWapPay := global.GVA_Ali_Pay.TradeWapPay
+
+	var p = alipay.TradeAppPay{}
+	p.NotifyURL = "http://xxx" //回调地
+
 	if err := mallOrderService.PaySuccess(orderNo, payType); err != nil {
 		global.GVA_LOG.Error("订单支付失败", zap.Error(err))
 		response.FailWithMessage("订单支付失败:"+err.Error(), c)
