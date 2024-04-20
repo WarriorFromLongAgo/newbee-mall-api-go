@@ -14,7 +14,7 @@ func (m *MallOrderRouter) InitMallOrderRouter(Router *gin.RouterGroup) {
 
 	var mallOrderRouterApi = v1.ApiGroupApp.MallApiGroup.MallOrderApi
 	{
-		mallOrderRouter.GET("/pay", mallOrderRouterApi.Pay)                           //支付接口调用支付宝
+		mallOrderRouter.POST("/pay", mallOrderRouterApi.Pay)                          //支付接口调用支付宝
 		mallOrderRouter.GET("/paySuccess", mallOrderRouterApi.PaySuccess)             //模拟支付成功回调的接口
 		mallOrderRouter.PUT("/order/:orderNo/finish", mallOrderRouterApi.FinishOrder) //确认收货接口
 		mallOrderRouter.PUT("/order/:orderNo/cancel", mallOrderRouterApi.CancelOrder) //取消订单接口

@@ -1,6 +1,8 @@
 package mall
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay/v3"
 	"go.uber.org/zap"
@@ -8,7 +10,9 @@ import (
 	"main.go/model/common/response"
 	mallReq "main.go/model/mall/request"
 	"main.go/utils"
+	"net/url"
 	"strconv"
+	"time"
 )
 
 type MallOrderApi struct {
@@ -55,19 +59,43 @@ func (m *MallOrderApi) PaySuccess(c *gin.Context) {
 }
 
 func (m *MallOrderApi) Pay(c *gin.Context) {
-	orderNo := c.Query("orderNo")
-	payType, _ := strconv.Atoi(c.Query("payType"))
-
-	tradeWapPay := global.GVA_Ali_Pay.TradeWapPay
-
-	var p = alipay.TradeAppPay{}
-	p.NotifyURL = "http://xxx" //回调地
-
-	if err := mallOrderService.PaySuccess(orderNo, payType); err != nil {
-		global.GVA_LOG.Error("订单支付失败", zap.Error(err))
-		response.FailWithMessage("订单支付失败:"+err.Error(), c)
+	var payParam mallReq.PayParams
+	_ = c.ShouldBindJSON(&payParam)
+	if err := utils.Verify(payParam, utils.PayParamVerify); err != nil {
+		response.FailWithMessage(err.Error(), c)
 	}
-	response.OkWithMessage("订单支付成功", c)
+
+	fmt.Println("dadhajjdasdjkajk", payParam)
+
+	pay := new(alipay.TradeWapPay)
+	pay.NotifyURL = "http://2854wo5243.wicp.vip/api/v1/notifyUrl" //回调地
+	pay.OutTradeNo = payParam.OrderNo
+	pay.TotalAmount = payParam.OriginalPrice
+	pay.Subject = payParam.GoodsName
+	pay.Body = payParam.GoodsName + "+body"
+	pay.ProductCode = "QUICK_WAP_WAY"
+	pay.TimeoutExpress = "10m"
+
+	now := time.Now()
+	timeAfter := now.Add(time.Minute * 10)
+	// 将当前时间转换成字符串格式
+	strTime := timeAfter.Format("20060102 15:04:05")
+	pay.TimeExpire = strTime
+	pay.PassbackParams = "diy diy 1111111"
+
+	resp, err := global.GVA_Ali_Pay.TradeWapPay(*pay)
+	if err != nil {
+		global.GVA_LOG.Error("订单支付", zap.Error(err))
+		return
+	}
+	query, err := url.ParseQuery(resp.String())
+	if err != nil {
+		return
+	}
+	j, _ := json.Marshal(query)
+	fmt.Println("dadadsada", j)
+
+	response.OkWithMessage("wapPay = "+resp.String(), c)
 }
 
 func (m *MallOrderApi) FinishOrder(c *gin.Context) {

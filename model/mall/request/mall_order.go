@@ -14,3 +14,10 @@ type SaveOrderParam struct {
 	CartItemIds []int `json:"cartItemIds"`
 	AddressId   int   `json:"addressId"`
 }
+
+type PayParams struct {
+	OrderNo       string `json:"orderNo"`
+	GoodsId       int    `json:"goodsId"`
+	GoodsName     string `json:"goodsName"`
+	OriginalPrice string `json:"originalPrice"`
+}
