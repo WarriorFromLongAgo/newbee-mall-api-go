@@ -11,5 +11,5 @@ var (
 	IndexConfigAddParamVerify    = Rules{"ConfigName": {NotEmpty()}, "ConfigType": {Ge("1"), Le("5")}, "GoodsId": {NotEmpty()}, "ConfigRank": {Ge("1"), Le("200")}}
 	IndexConfigUpdateParamVerify = Rules{"ConfigId": {NotEmpty()}, "ConfigName": {NotEmpty()}, "ConfigType": {Ge("1"), Le("5")}, "GoodsId": {NotEmpty()}, "ConfigRank": {Ge("1"), Le("200")}}
 	SaveOrderParamVerify         = Rules{"CartItemIds": {NotEmpty()}, "AddressId": {NotEmpty()}}
-	PayParamVerify               = Rules{"OrderNo": {NotEmpty()}, "GoodsId": {NotEmpty()}, "GoodsName": {NotEmpty()}, "OriginalPrice": {NotEmpty()}}
+	PayParamVerify               = Rules{"OrderNo": {NotEmpty()}, "OriginalPrice": {NotEmpty()}, "PayType": {NotEmpty()}}
 )

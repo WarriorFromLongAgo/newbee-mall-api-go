@@ -63,6 +63,7 @@ func (m *MallOrderApi) Pay(c *gin.Context) {
 	_ = c.ShouldBindJSON(&payParam)
 	if err := utils.Verify(payParam, utils.PayParamVerify); err != nil {
 		response.FailWithMessage(err.Error(), c)
+		return
 	}
 
 	fmt.Println("dadhajjdasdjkajk", payParam)
@@ -70,20 +71,26 @@ func (m *MallOrderApi) Pay(c *gin.Context) {
 	pay := new(alipay.TradeWapPay)
 	pay.NotifyURL = "http://2854wo5243.wicp.vip/api/v1/notifyUrl" //回调地
 	pay.OutTradeNo = payParam.OrderNo
-	pay.TotalAmount = payParam.OriginalPrice
-	pay.Subject = payParam.GoodsName
-	pay.Body = payParam.GoodsName + "+body"
+	pay.Subject = payParam.OrderNo
+	pay.Body = payParam.OrderNo + " == " + payParam.OriginalPrice.String() + " == body"
 	pay.ProductCode = "QUICK_WAP_WAY"
 	pay.TimeoutExpress = "10m"
+	pay.TotalAmount = "1.12"
 
 	now := time.Now()
 	timeAfter := now.Add(time.Minute * 10)
 	// 将当前时间转换成字符串格式
 	strTime := timeAfter.Format("20060102 15:04:05")
 	pay.TimeExpire = strTime
-	pay.PassbackParams = "diy diy 1111111"
+
+	values := url.Values{} //回调参数，这里只能这样写，要进行urlEncode才能传给支付宝
+	//需要回传的参数
+	values.Add("OrderNo", payParam.OrderNo)
+	//支付宝会把passback_params=
+	pay.PassbackParams = values.Encode()
 
 	resp, err := global.GVA_Ali_Pay.TradeWapPay(*pay)
+	fmt.Println("respresprespresp", resp)
 	if err != nil {
 		global.GVA_LOG.Error("订单支付", zap.Error(err))
 		return
@@ -93,9 +100,9 @@ func (m *MallOrderApi) Pay(c *gin.Context) {
 		return
 	}
 	j, _ := json.Marshal(query)
-	fmt.Println("dadadsada", j)
+	fmt.Println("dadadsada", string(j))
 
-	response.OkWithMessage("wapPay = "+resp.String(), c)
+	response.OkWithData(resp.String(), c)
 }
 
 func (m *MallOrderApi) FinishOrder(c *gin.Context) {

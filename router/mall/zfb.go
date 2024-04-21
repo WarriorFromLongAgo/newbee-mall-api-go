@@ -13,6 +13,6 @@ func (m *MallZfbRouter) InitMallZfbRouter(Router *gin.RouterGroup) {
 
 	var mallZfbRouterApi = v1.ApiGroupApp.MallApiGroup.MallZfbApi
 	{
-		mallOrderRouter.GET("/notifyUrl", mallZfbRouterApi.NotifyUrl) //支付接口调用支付宝
+		mallOrderRouter.POST("/notifyUrl", mallZfbRouterApi.NotifyUrl) //支付接口调用支付宝
 	}
 }
